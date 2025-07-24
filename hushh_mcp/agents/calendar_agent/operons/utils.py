@@ -1,7 +1,15 @@
 # hushh_mcp/agents/calendar_agent/operons/utils.py
 
-# Utility functions for time parsing, formatting, etc.
+from hushh_mcp.agents.calendar_agent.state.gemini_llm import gemini_chat
 
 def parse_time_range(natural_language_str):
-    # Placeholder: parse "next week" or "Friday 3-5pm" to datetime range
-    return ("2025-07-25T15:00:00Z", "2025-07-25T17:00:00Z")
+    # Use Gemini to parse natural language time ranges if needed
+    prompt = f"Parse this time range into ISO 8601 start and end datetimes: '{natural_language_str}'. Respond as JSON: {{'start': '...', 'end': '...'}}"
+    response = gemini_chat(prompt)
+    try:
+        import json
+        parsed = json.loads(response)
+        return (parsed["start"], parsed["end"])
+    except Exception:
+        # Fallback to a static example
+        return ("2025-07-25T15:00:00Z", "2025-07-25T17:00:00Z")

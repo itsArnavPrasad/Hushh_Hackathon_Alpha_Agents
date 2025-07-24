@@ -4,6 +4,8 @@ from typing import Literal, TypedDict, Optional, NewType
 from pydantic import BaseModel, Field
 from datetime import datetime
 from enum import Enum
+from typing import List
+
 
 # ==================== Aliases ====================
 
@@ -19,7 +21,7 @@ class HushhConsentToken(BaseModel):
     token: str
     user_id: UserID
     agent_id: AgentID
-    scope: ConsentScope
+    scope: List[str]
     issued_at: int  # epoch ms
     expires_at: int  # epoch ms
     signature: str

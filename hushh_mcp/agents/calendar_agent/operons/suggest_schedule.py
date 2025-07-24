@@ -1,19 +1,22 @@
-# hushh_mcp/agents/calendar_agent/operons/suggest_schedule.py
-
 from hushh_mcp.consent.token import validate_token
 from hushh_mcp.constants import ConsentScope
-# from hushh_mcp.state.prompts import SUGGEST_PROMPT
-# from langchain.llms import OpenAI  # Example, depends on your setup
+from hushh_mcp.agents.calendar_agent.state.prompts import SUGGEST_SCHEDULE_PROMPT
+from hushh_mcp.agents.calendar_agent.state.gemini_llm import gemini_chat
+import json
 
 def suggest_optimal_schedule(user_id, consent_token, free_busy, user_preferences):
     valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.CALENDAR_READ)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"Consent validation failed: {reason}")
 
-    # Use LLM or heuristic to suggest best slot
-    # Example: Use LangChain prompt (pseudo-code)
-    # llm = OpenAI()
-    # prompt = SUGGEST_PROMPT.format(free_busy=free_busy, preferences=user_preferences)
-    # suggestion = llm(prompt)
-    suggestion = {"suggested_time": "2025-07-25T15:00:00Z"}  # Placeholder
-    return suggestion
+    prompt = SUGGEST_SCHEDULE_PROMPT.format(
+        task_description=user_preferences.get("task", "No task provided"),
+        free_slots=free_busy,
+        preferences=user_preferences
+    )
+    suggestion_text = gemini_chat(prompt)
+    try:
+        suggestion = json.loads(suggestion_text)
+    except Exception:
+        suggestion = {"suggested_time": None, "reason": suggestion_text}
+    return suggestion 

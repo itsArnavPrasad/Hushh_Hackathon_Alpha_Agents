@@ -9,8 +9,13 @@ AGENT_ID = "calendar_agent"
 
 @pytest.fixture
 def valid_token():
-    # Issue a valid consent token for all required scopes
-    return issue_token(USER_ID, AGENT_ID, ConsentScope.CALENDAR_READ).token
+    scopes = [
+        ConsentScope.CALENDAR_READ.value,
+        ConsentScope.CALENDAR_WRITE.value,
+        ConsentScope.GCAL_READ.value,
+        ConsentScope.GCAL_WRITE.value
+    ]
+    return issue_token(USER_ID, AGENT_ID, scopes).token
 
 @pytest.fixture
 def mock_mcp_adapter():
