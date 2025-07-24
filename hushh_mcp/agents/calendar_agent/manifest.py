@@ -1,9 +1,16 @@
-# hushh_mcp/agents/calendar_agent/manifest.py
-
 manifest = {
     "id": "calendar_agent",
-    "name": "Calendar Agent Agent",
-    "scopes": ["vault.read.email"],
-    "version": "0.1.0",
-    "description": "Generated agent for calendar_agent"
+    "name": "ChronoAgent",
+    "description": (
+        "A privacy-preserving, autonomous AI calendar assistant. "
+        "Schedules, reschedules, and manages tasks by integrating with Google Calendar, "
+        "enforcing trust, consent, and encrypted data workflows."
+    ),
+    "scopes": [
+        "calendar.read",
+        "calendar.write",
+        "gcal.read",
+        "gcal.write"
+    ],
+    "version": "1.0.0"
 }
