@@ -4,7 +4,7 @@ from hushh_mcp.consent.token import validate_token
 from hushh_mcp.constants import ConsentScope
 from hushh_mcp.agents.calendar_agent.state.prompts import RESCHEDULE_TASK_PROMPT
 from hushh_mcp.agents.calendar_agent.state.gemini_llm import gemini_chat
-from hushh_mcp.external_mcp.google_calendar.mcp_adapter import update_event
+from hushh_mcp.operons.mcp_adapter import update_event
 
 def reschedule_task(user_id, consent_token, calendar_id, event_id, new_time, reason=None, event_details=None, user_intent=None, conflicts=None):
     """

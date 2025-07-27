@@ -2,7 +2,7 @@
 
 from hushh_mcp.consent.token import validate_token
 from hushh_mcp.constants import ConsentScope
-from hushh_mcp.external_mcp.google_calendar.mcp_adapter import get_freebusy
+from hushh_mcp.operons.mcp_adapter import get_freebusy
 from hushh_mcp.agents.calendar_agent.state.memory import CalendarAgentMemory
 from hushh_mcp.agents.calendar_agent.state.gemini_llm import gemini_chat
 from hushh_mcp.agents.calendar_agent.state.prompts import SUMMARIZE_CALENDAR_PROMPT

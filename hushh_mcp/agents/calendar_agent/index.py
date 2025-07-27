@@ -1,14 +1,16 @@
-# hushh_mcp/agents/calendar_agent/index.py
-
 from hushh_mcp.consent.token import validate_token
 from hushh_mcp.constants import ConsentScope
 from hushh_mcp.trust.link import verify_trust_link
 from hushh_mcp.operons.detect_slots import detect_available_slots
 from hushh_mcp.operons.suggest_schedule import suggest_optimal_schedule
 from hushh_mcp.operons.reschedule_task import reschedule_task
-from hushh_mcp.operons.gcal_sync import sync_with_gcal, add_event_to_gcal
-
-# LangGraph imports
+from hushh_mcp.operons.gcal_sync import (
+    sync_with_gcal,
+    add_event_to_gcal,
+    get_freebusy,
+    list_calendars,
+    list_colors,
+)
 from langgraph.graph import StateGraph, END
 
 # --- Agent State Definition ---
@@ -24,7 +26,7 @@ class CalendarAgentState(dict):
     """
     pass
 
-# --- LangGraph Node Functions (Bacteria: one function = one responsibility) ---
+# --- LangGraph Node Functions ---
 
 def node_detect_slots(state: CalendarAgentState):
     slots = detect_available_slots(
@@ -52,7 +54,8 @@ def node_reschedule_task(state: CalendarAgentState):
 def node_sync_gcal(state: CalendarAgentState):
     events = sync_with_gcal(
         state["user_id"], state["consent_token"],
-        state.get("sync_time_range", ())
+        state.get("sync_time_range", ()),
+        state.get("calendar_id"),
     )
     state["gcal_events"] = events
     return state
@@ -60,9 +63,33 @@ def node_sync_gcal(state: CalendarAgentState):
 def node_add_event_to_gcal(state: CalendarAgentState):
     result = add_event_to_gcal(
         state["user_id"], state["consent_token"],
-        state.get("event_data", {})
+        state.get("event_data", {}),
+        state.get("calendar_id"),
     )
     state["add_event_result"] = result
+    return state
+
+def node_get_freebusy(state: CalendarAgentState):
+    result = get_freebusy(
+        state["user_id"], state["consent_token"],
+        state.get("freebusy_time_range"),
+        state.get("calendar_ids"),
+    )
+    state["freebusy_result"] = result
+    return state
+
+def node_list_calendars(state: CalendarAgentState):
+    result = list_calendars(
+        state["user_id"], state["consent_token"]
+    )
+    state["calendars"] = result
+    return state
+
+def node_list_colors(state: CalendarAgentState):
+    result = list_colors(
+        state["user_id"], state["consent_token"]
+    )
+    state["colors"] = result
     return state
 
 # --- LangGraph State Machine Construction ---
@@ -75,8 +102,11 @@ def build_calendar_agent_graph():
     graph.add_node("RescheduleTask", node_reschedule_task)
     graph.add_node("SyncGCal", node_sync_gcal)
     graph.add_node("AddEventToGCal", node_add_event_to_gcal)
+    graph.add_node("GetFreeBusy", node_get_freebusy)
+    graph.add_node("ListCalendars", node_list_calendars)
+    graph.add_node("ListColors", node_list_colors)
 
-    # Use conditional routing instead of old-style condition=
+    # Use conditional routing
     def intent_router(state: CalendarAgentState):
         intent = state.get("intent")
         if intent == "suggest_schedule":
@@ -87,6 +117,12 @@ def build_calendar_agent_graph():
             return "SyncGCal"
         elif intent == "add_event_to_gcal":
             return "AddEventToGCal"
+        elif intent == "get_freebusy":
+            return "GetFreeBusy"
+        elif intent == "list_calendars":
+            return "ListCalendars"
+        elif intent == "list_colors":
+            return "ListColors"
         else:
             raise ValueError(f"Unknown intent: {intent}")
 
@@ -98,6 +134,9 @@ def build_calendar_agent_graph():
     graph.add_edge("AddEventToGCal", END)
     graph.add_edge("RescheduleTask", END)
     graph.add_edge("SyncGCal", END)
+    graph.add_edge("GetFreeBusy", END)
+    graph.add_edge("ListCalendars", END)
+    graph.add_edge("ListColors", END)
 
     # Entry point
     graph.set_entry_point("DetectSlots")
@@ -106,26 +145,16 @@ def build_calendar_agent_graph():
 
 # --- Main Entrypoint ---
 def run_agent(user_id, consent_token, intent, **kwargs):
-    # Consent validation (bacteria: always explicit)
+    # Consent validation
     valid, reason, parsed = validate_token(consent_token)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"❌ Consent validation failed: {reason}")
 
-    required_scopes = [
-        ConsentScope.CALENDAR_READ.value,
-        ConsentScope.CALENDAR_WRITE.value,
-        ConsentScope.GCAL_READ.value,
-        ConsentScope.GCAL_WRITE.value
-    ]
-
-    # Additional scope check (optional)
-    # Can add scope check logic here if needed using parsed.scopes
-
     # Build initial state
     state = {
-        "user_id":user_id,
-        "consent_token":consent_token,
-        "intent":intent,
+        "user_id": user_id,
+        "consent_token": consent_token,
+        "intent": intent,
         **kwargs
     }
 

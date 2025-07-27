@@ -19,10 +19,10 @@ def valid_token():
 
 @pytest.fixture
 def mock_mcp_adapter():
-    with patch("hushh_mcp.external_mcp.google_calendar.mcp_adapter.fetch_calendar_events", return_value=[{"id": "evt1", "summary": "Test Event"}]):
-        with patch("hushh_mcp.external_mcp.google_calendar.mcp_adapter.get_free_busy", return_value={"busy": []}):
-            with patch("hushh_mcp.external_mcp.google_calendar.mcp_adapter.create_event", return_value={"status": "created"}):
-                with patch("hushh_mcp.external_mcp.google_calendar.mcp_adapter.update_event", return_value={"status": "updated"}):
+    with patch("hushh_mcp.operons.mcp_adapter.fetch_calendar_events", return_value=[{"id": "evt1", "summary": "Test Event"}]):
+        with patch("hushh_mcp.operons.mcp_adapter.get_free_busy", return_value={"busy": []}):
+            with patch("hushh_mcp.operons.mcp_adapter.create_event", return_value={"status": "created"}):
+                with patch("hushh_mcp.operons.mcp_adapter.update_event", return_value={"status": "updated"}):
                     yield
 
 @pytest.fixture

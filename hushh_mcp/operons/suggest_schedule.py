@@ -1,5 +1,4 @@
 # hushh_mcp/operons/suggest_schedule.py
-
 from hushh_mcp.consent.token import validate_token
 from hushh_mcp.constants import ConsentScope
 from hushh_mcp.agents.calendar_agent.state.prompts import SUGGEST_SCHEDULE_PROMPT
