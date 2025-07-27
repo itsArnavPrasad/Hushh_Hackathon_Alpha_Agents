@@ -3,10 +3,10 @@
 from hushh_mcp.consent.token import validate_token
 from hushh_mcp.constants import ConsentScope
 from hushh_mcp.trust.link import verify_trust_link
-from .operons.detect_slots import detect_available_slots
-from .operons.suggest_schedule import suggest_optimal_schedule
-from .operons.reschedule_task import reschedule_task
-from .operons.gcal_sync import sync_with_gcal, add_event_to_gcal
+from hushh_mcp.operons.detect_slots import detect_available_slots
+from hushh_mcp.operons.suggest_schedule import suggest_optimal_schedule
+from hushh_mcp.operons.reschedule_task import reschedule_task
+from hushh_mcp.operons.gcal_sync import sync_with_gcal, add_event_to_gcal
 
 # LangGraph imports
 from langgraph.graph import StateGraph, END

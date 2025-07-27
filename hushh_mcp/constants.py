@@ -16,12 +16,10 @@ class ConsentScope(str, Enum):
     AGENT_FINANCE_ANALYZE = "agent.finance.analyze"
     AGENT_IDENTITY_VERIFY = "agent.identity.verify"
     AGENT_SALES_OPTIMIZE = "agent.sales.optimize"
-
-    # Calendar agent scopes (added for calendar agent functionality)
-    CALENDAR_READ = "calendar.read"
-    CALENDAR_WRITE = "calendar.write"
-    GCAL_READ = "gcal.read"
-    GCAL_WRITE = "gcal.write"
+    AGENT_CALENDAR_READ = "agent.calendar.read"
+    AGENT_CALENDAR_WRITE = "agent.calendar.write"
+    AGENT_GCALE_READ = "agent.gcal.read"
+    AGENT_GCALE_WRITE = "agent.gcal.write"
 
     # Custom and extensible scopes
     CUSTOM_TEMPORARY = "custom.temporary"

@@ -13,25 +13,17 @@ from hushh_mcp.types import HushhConsentToken, ConsentScope, UserID, AgentID
 # ========== Internal Revocation Registry ==========
 _revoked_tokens = set()
 
-import json
-
 # ========== Token Generator ==========
 
 def issue_token(
     user_id: UserID,
     agent_id: AgentID,
-    scopes,  # Accepts List[str] or List[ConsentScope] or str
+    scope: ConsentScope,
     expires_in_ms: int = DEFAULT_CONSENT_TOKEN_EXPIRY_MS
 ) -> HushhConsentToken:
     issued_at = int(time.time() * 1000)
     expires_at = issued_at + expires_in_ms
-
-    # Normalize scopes to list of strings
-    if isinstance(scopes, (ConsentScope, str)):
-        scopes = [str(scopes)]
-    scopes_str = json.dumps([str(s) for s in scopes])  # Store as JSON string
-
-    raw = f"{user_id}|{agent_id}|{scopes_str}|{issued_at}|{expires_at}"
+    raw = f"{user_id}|{agent_id}|{scope.value}|{issued_at}|{expires_at}"
     signature = _sign(raw)
 
     token_string = f"{CONSENT_TOKEN_PREFIX}:{base64.urlsafe_b64encode(raw.encode()).decode()}.{signature}"
@@ -40,7 +32,7 @@ def issue_token(
         token=token_string,
         user_id=user_id,
         agent_id=agent_id,
-        scope=[str(s) for s in scopes],  # Store as JSON string
+        scope=scope,
         issued_at=issued_at,
         expires_at=expires_at,
         signature=signature
@@ -63,21 +55,15 @@ def validate_token(
             return False, "Invalid token prefix", None
 
         decoded = base64.urlsafe_b64decode(encoded.encode()).decode()
-        user_id, agent_id, scopes_str, issued_at_str, expires_at_str = decoded.split("|")
+        user_id, agent_id, scope_str, issued_at_str, expires_at_str = decoded.split("|")
 
-        raw = f"{user_id}|{agent_id}|{scopes_str}|{issued_at_str}|{expires_at_str}"
+        raw = f"{user_id}|{agent_id}|{scope_str}|{issued_at_str}|{expires_at_str}"
         expected_sig = _sign(raw)
 
         if not hmac.compare_digest(signature, expected_sig):
             return False, "Invalid signature", None
 
-        # Parse scopes as list
-        try:
-            scopes = json.loads(scopes_str)
-        except Exception:
-            scopes = [scopes_str]
-
-        if expected_scope and str(expected_scope) not in scopes:
+        if expected_scope and scope_str != expected_scope.value:
             return False, "Scope mismatch", None
 
         if int(time.time() * 1000) > int(expires_at_str):
@@ -87,7 +73,7 @@ def validate_token(
             token=token_str,
             user_id=user_id,
             agent_id=agent_id,
-            scope=scopes,  # Now a list
+            scope=scope_str,  # can optionally convert to ConsentScope(scope_str)
             issued_at=int(issued_at_str),
             expires_at=int(expires_at_str),
             signature=signature

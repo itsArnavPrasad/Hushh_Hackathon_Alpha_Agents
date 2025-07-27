@@ -1,5 +1,4 @@
 # hushh_mcp/cli/generate_agent.py
-
 import argparse
 import os
 from pathlib import Path
