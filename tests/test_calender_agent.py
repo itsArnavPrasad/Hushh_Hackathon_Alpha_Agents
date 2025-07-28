@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 from hushh_mcp.agents.calendar_agent.index import run_agent
-from hushh_mcp.consent.token import issue_token
+from hushh_mcp.consent.token import issue_token, revoke_token
 from hushh_mcp.constants import ConsentScope
 
 USER_ID = "user_123"

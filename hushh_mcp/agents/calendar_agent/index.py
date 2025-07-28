@@ -164,12 +164,12 @@ def run_agent(user_id, consent_token, intent, **kwargs):
         raise PermissionError(f"❌ Consent validation failed: {reason}")
 
     # Build initial state
-    state = {
-        "user_id": user_id,
-        "consent_token": consent_token,
-        "intent": intent,
-        **kwargs
-    }
+    state = CalendarAgentState()
+    state["user_id"] = user_id
+    state["consent_token"] = consent_token
+    state["intent"] = intent
+    for k, v in kwargs.items():
+        state[k] = v
 
     graph = build_calendar_agent_graph()
     result = graph.invoke(state)
