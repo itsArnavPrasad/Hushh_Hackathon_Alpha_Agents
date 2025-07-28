@@ -18,8 +18,8 @@ class ConsentScope(str, Enum):
     AGENT_SALES_OPTIMIZE = "agent.sales.optimize"
     AGENT_CALENDAR_READ = "agent.calendar.read"
     AGENT_CALENDAR_WRITE = "agent.calendar.write"
-    AGENT_GCALE_READ = "agent.gcal.read"
-    AGENT_GCALE_WRITE = "agent.gcal.write"
+    AGENT_GCAL_READ = "agent.gcal.read"
+    AGENT_GCAL_WRITE = "agent.gcal.write"
 
     # Custom and extensible scopes
     CUSTOM_TEMPORARY = "custom.temporary"

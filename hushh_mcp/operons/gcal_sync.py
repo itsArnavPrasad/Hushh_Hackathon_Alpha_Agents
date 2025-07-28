@@ -14,7 +14,7 @@ def sync_with_gcal(user_id, consent_token, time_range=None, calendar_id=None):
     Fetch events from Google Calendar via MCP.
     Requires gcal.read scope.
     """
-    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.GCAL_READ)
+    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.AGENT_GCAL_READ)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"Consent validation failed: {reason}")
 
@@ -35,7 +35,7 @@ def add_event_to_gcal(user_id, consent_token, event_data, calendar_id=None):
     Add an event to Google Calendar via MCP.
     Requires gcal.write scope.
     """
-    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.GCAL_WRITE)
+    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.AGENT_GCAL_WRITE)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"Consent validation failed: {reason}")
 
@@ -54,7 +54,7 @@ def get_freebusy(user_id, consent_token, time_range, calendar_ids=None):
     Get free/busy information from Google Calendar via MCP.
     Requires gcal.read scope.
     """
-    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.GCAL_READ)
+    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.AGENT_GCAL_READ)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"Consent validation failed: {reason}")
 
@@ -75,7 +75,7 @@ def list_calendars(user_id, consent_token):
     List all available calendars for the user via MCP.
     Requires gcal.read scope.
     """
-    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.GCAL_READ)
+    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.AGENT_GCAL_READ)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"Consent validation failed: {reason}")
 
@@ -89,7 +89,7 @@ def list_colors(user_id, consent_token):
     List available event colors via MCP.
     Requires gcal.read scope.
     """
-    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.GCAL_READ)
+    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.AGENT_GCAL_READ)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"Consent validation failed: {reason}")
 

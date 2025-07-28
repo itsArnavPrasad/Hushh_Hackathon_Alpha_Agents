@@ -27,8 +27,13 @@ class CalendarAgentState(dict):
     pass
 
 # --- LangGraph Node Functions ---
-
 def node_detect_slots(state: CalendarAgentState):
+    print("DEBUG node_detect_slots state:", state)
+
+    # If the intent is not 'detect_slots' or 'suggest_schedule', just return the state unchanged
+    if state.get("intent") not in ("detect_slots", "suggest_schedule"):
+        return state
+    # Otherwise, do the slot detection
     slots = detect_available_slots(
         state["user_id"], state["consent_token"], **state.get("detect_slots_args", {})
     )
@@ -106,8 +111,11 @@ def build_calendar_agent_graph():
     graph.add_node("ListCalendars", node_list_calendars)
     graph.add_node("ListColors", node_list_colors)
 
-    # Use conditional routing
+    # Conditional router from DetectSlots
     def intent_router(state: CalendarAgentState):
+        print("DEBUG intent_router state:", state)
+        if not state or "intent" not in state:
+            raise ValueError(f"State missing or intent missing! State: {state}")
         intent = state.get("intent")
         if intent == "suggest_schedule":
             return "SuggestSchedule"
@@ -123,13 +131,14 @@ def build_calendar_agent_graph():
             return "ListCalendars"
         elif intent == "list_colors":
             return "ListColors"
+        elif intent == "detect_slots":
+            return "DetectSlots"
         else:
             raise ValueError(f"Unknown intent: {intent}")
 
-    # Define transition from DetectSlots based on intent
     graph.add_conditional_edges("DetectSlots", intent_router)
 
-    # Add direct edges for follow-up logic
+    # Only add edges for multi-step flows
     graph.add_edge("SuggestSchedule", "AddEventToGCal")
     graph.add_edge("AddEventToGCal", END)
     graph.add_edge("RescheduleTask", END)
@@ -137,15 +146,19 @@ def build_calendar_agent_graph():
     graph.add_edge("GetFreeBusy", END)
     graph.add_edge("ListCalendars", END)
     graph.add_edge("ListColors", END)
+    graph.add_edge("DetectSlots", END)  # For direct detect_slots intent
 
-    # Entry point
     graph.set_entry_point("DetectSlots")
-
     return graph.compile()
 
 # --- Main Entrypoint ---
 def run_agent(user_id, consent_token, intent, **kwargs):
-    # Consent validation
+    print("DEBUG run_agent user_id:", user_id)
+    print("DEBUG run_agent consent_token:", consent_token)
+    print("DEBUG run_agent intent:", intent)
+    print("DEBUG run_agent kwargs:", kwargs)
+
+    # Consent validation (always at the start)
     valid, reason, parsed = validate_token(consent_token)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"❌ Consent validation failed: {reason}")
@@ -158,9 +171,9 @@ def run_agent(user_id, consent_token, intent, **kwargs):
         **kwargs
     }
 
-    # Run LangGraph
     graph = build_calendar_agent_graph()
     result = graph.invoke(state)
+    print("DEBUG run_agent result:", result)
     return result
 
 # --- CLI/Test usage ---

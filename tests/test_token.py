@@ -13,9 +13,8 @@ from hushh_mcp.types import HushhConsentToken
 
 
 USER_ID = "user_test"
-AGENT_ID = "agent_alpha"
-VALID_SCOPE = ConsentScope.VAULT_READ_EMAIL
-
+AGENT_ID = "calendar_agent"
+VALID_SCOPE = ConsentScope.AGENT_GCAL_WRITE
 
 def test_issue_and_validate_token():
     token_obj: HushhConsentToken = issue_token(USER_ID, AGENT_ID, VALID_SCOPE)

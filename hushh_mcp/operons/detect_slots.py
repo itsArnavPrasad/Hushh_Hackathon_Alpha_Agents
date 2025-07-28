@@ -11,7 +11,7 @@ def detect_available_slots(user_id, consent_token, calendar_ids=None, time_min=N
     """
     Calls the MCP server's get-freebusy tool to find free/busy slots.
     """
-    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.CALENDAR_READ)
+    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.AGENT_GCAL_READ)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"Consent validation failed: {reason}")
 

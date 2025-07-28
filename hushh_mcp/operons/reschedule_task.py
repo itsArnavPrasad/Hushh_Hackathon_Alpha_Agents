@@ -10,7 +10,7 @@ def reschedule_task(user_id, consent_token, calendar_id, event_id, new_time, rea
     """
     Uses Gemini LLM for reasoning, then calls MCP update-event tool to reschedule.
     """
-    valid, reason_msg, parsed = validate_token(consent_token, expected_scope=ConsentScope.CALENDAR_WRITE)
+    valid, reason_msg, parsed = validate_token(consent_token, expected_scope=ConsentScope.AGENT_GCAL_WRITE)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"Consent validation failed: {reason_msg}")
 

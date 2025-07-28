@@ -9,7 +9,7 @@ def suggest_optimal_schedule(user_id, consent_token, free_busy, user_preferences
     """
     Uses LLM to suggest a schedule based on free/busy slots (from get-freebusy) and user preferences.
     """
-    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.CALENDAR_READ)
+    valid, reason, parsed = validate_token(consent_token, expected_scope=ConsentScope.AGENT_GCAL_READ)
     if not valid or parsed.user_id != user_id:
         raise PermissionError(f"Consent validation failed: {reason}")
 
